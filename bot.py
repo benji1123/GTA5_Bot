@@ -10,35 +10,46 @@ class Bot(object):
     
     def __init__(self):
         self.fov = None
-        self.roi = None
+        self.roi = None # mask for isolating ROI in image-frame
         print('bot created')
 
     '''
     Screen-Capture the Game Window
     '''
     def look(self, preview=True):
-        # Screen Capture
-        self.fov = np.asarray(ImageGrab.grab(bbox=(0,0,800,800)).convert('L'), 
-            dtype=np.uint8)
-        print(self.fov.shape)
+        try:
+            # single-channel greyscale image
+            self.fov = np.asarray(
+                ImageGrab.grab(bbox=(
+                    0,0,800,800)).convert('L'), 
+                dtype=np.uint8)
 
-    def canny(self, img):
-        processed_img = cv2.Canny(img, threshold1=200, threshold2=300)
-        return processed_img
+        except OSError:
+            print('OSError: cannot capture screen')
 
-    def isolate_roi(self, img, mask):
-        return cv2.bitwise_and(img, mask)
-
+    '''
+    Image Processing
+    '''
     def show_lanelines(self):
-        img = self.canny(self.fov)
-        img = cv2.GaussianBlur(img, (5,5), 0)
-        img = self.isolate_roi(img, self.roi)  
-        lines = cv2.HoughLinesP(img, 1, np.pi/180, 180, 20, 15)
+        img = cv2.Canny(self.fov, 200, 300)                 # get edges only
+        img = cv2.GaussianBlur(img, (3,3), 0)               # mitigate aliasing
+        img = cv2.bitwise_and(img, self.roi)                # remove non-ROI
+        # get lines as coordinate-pairs from frame 
+        lines = cv2.HoughLinesP(img, 1, np.pi/180,          
+                                180, np.array([]),
+                                100,5)             
 
         try:
-            for x1,y1,x2,y2 in lines[0]:
-                cv2.line(img, (x1,y1), (x2,y2), [255,255,255], 3)
-        except:
-            pass # sorry (in-case there are no lines)
+            # draw detected lines
+            for l in lines:
+                cv2.line(img, 
+                         (l[0,0],l[0,1]), 
+                         (l[0,2],l[0,3]), 
+                         [255,255,255],
+                         3)
+
+        except TypeError:
+            print('No lines detected')
+            pass
 
         return img
