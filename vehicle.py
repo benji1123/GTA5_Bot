@@ -3,14 +3,16 @@ from tools import keypresser as keybot
 
 
 class Vehicle(object):
-	def __init__(self, accelerate=False, brake=False, angle=0):
+	def __init__(self):
 		print('Vehicle')
 
-	def brake():
+	def brake(self):
+		keybot.press('S')
 		print('brake')
 
-	def accelerate():
+	def accelerate(self):
+		keybot.press('W')
 		print('accelerate')
 
-	def steer(angle):
+	def steer(self, angle):
 		print('steer @ {} deg'.format(angle))

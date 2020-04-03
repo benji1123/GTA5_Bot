@@ -2,7 +2,9 @@ from PIL import ImageGrab
 import numpy as np
 import cv2
 import time
+from time import sleep
 from scooter_bot import ScooterBot
+import pyautogui
 
 
 def main():
@@ -14,7 +16,14 @@ def main():
     Control Loop
     '''
     while True:
-        bot.look()
+        bot.look(False)
+        # img = bot.fov
+        img = bot.show_lanelines()
+        # print(img.shape)
+        # cv2.imshow('', cv2.bitwise_and(bot.fov, self.roi))
+        cv2.imshow('', img)
+
+
         frame_count += 1
 
         # QUIT

@@ -9,31 +9,36 @@ import sys
 class Bot(object):
     
     def __init__(self):
-    	self.fov = None
-    	print('bot created')
+        self.fov = None
+        self.roi = None
+        print('bot created')
 
     '''
     Screen-Capture the Game Window
     '''
-    def look(
-    	self, preview=True, 
-    	x1=0, y1=40, 
-    	x2=800, y2=625):
+    def look(self, preview=True):
+        # Screen Capture
+        self.fov = np.asarray(ImageGrab.grab(bbox=(0,0,800,800)).convert('L'), 
+            dtype=np.uint8)
+        print(self.fov.shape)
 
-    	# Screen Capture
-        fov = np.array(ImageGrab.grab(bbox=(x1,y1,x2,y2)))
-        self.fov = fov
+    def canny(self, img):
+        processed_img = cv2.Canny(img, threshold1=200, threshold2=300)
+        return processed_img
 
-        # Additional Processing
-        processed_frame = process_img(fov)
+    def isolate_roi(self, img, mask):
+        return cv2.bitwise_and(img, mask)
 
-        # Display
-        if preview:
-            cv2.imshow('screen', cv2.cvtColor(
-    		    processed_frame, cv2.COLOR_BGR2RGB))
+    def show_lanelines(self):
+        img = self.canny(self.fov)
+        img = cv2.GaussianBlur(img, (5,5), 0)
+        img = self.isolate_roi(img, self.roi)  
+        lines = cv2.HoughLinesP(img, 1, np.pi/180, 180, 20, 15)
 
-        
-def process_img(original_img):
-    processed_img = cv2.cvtColor(original_img, cv2.COLOR_BGR2GRAY)
-    processed_img = cv2.Canny(processed_img, 200, 300)
-    return processed_img
+        try:
+            for x1,y1,x2,y2 in lines[0]:
+                cv2.line(img, (x1,y1), (x2,y2), [255,255,255], 3)
+        except:
+            pass # sorry (in-case there are no lines)
+
+        return img
