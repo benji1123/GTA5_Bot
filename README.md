@@ -3,6 +3,7 @@ Based on the [GTA V bot](https://github.com/Sentdex/pygta5) by "[Sentdex](https:
 
 ### Lane-Line Algorithm drawn in-frame
 ![fov](images/pov_motorcycle.PNG)
+
 Program runs at 6 FPS
 
 ### Driving Algorithm
