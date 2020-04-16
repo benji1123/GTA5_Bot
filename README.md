@@ -8,5 +8,3 @@ Program runs at 6 FPS
 
 ### Driving Algorithm
 I may or may spend time adding this 
-
-((̲̅ ̲̅(̲̅C̲̅r̲̅a̲̅y̲̅o̲̅l̲̲̅̅a̲̅( ̲̅((>
